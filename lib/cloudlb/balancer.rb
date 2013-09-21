@@ -10,6 +10,7 @@ module CloudLB
     attr_reader :connection_logging
     attr_reader :status
     attr_reader :ssl
+    attr_reader :timeout
 
     # Creates a new CloudLB::Balancer object representing a Load Balancer instance.
     def initialize(connection,id)
@@ -35,6 +36,7 @@ module CloudLB
       @algorithm             = data["algorithm"]
       @connection_logging    = data["connectionLogging"]["enabled"]
       @status                = data["status"]
+      @timeout               = data["timeout"]
       true
     end
     alias :refresh :populate
@@ -229,6 +231,14 @@ module CloudLB
     def protocol=(new_protocol="")
       (raise CloudLB::Exception::MissingArgument, "Must provide a new protocol") if new_protocol.to_s.empty?
       body = {"protocol" => new_protocol}
+      update(body)
+    end
+
+    def timeout=(new_timeout="")
+      (raise CloudLB::Exception::Syntax, "Must provide a new timout") unless new_timeout.to_s =~ /^\d+$/
+      t = new_timeout.to_i
+      (raise CloudLB::Exception::Syntax, "Timout must be between 30 and 120") if t < 30 or t > 120
+      body = {"timeout" => t}
       update(body)
     end
 
