@@ -181,7 +181,9 @@ module CloudLB
 
       response = request.response
       print "DEBUG: Body is #{response.body}\n" if ENV['LOADBALANCERS_VERBOSE']
-      raise CloudLB::Exception::ExpiredAuthToken if response.code.to_s == "401"
+      res_code = response.code.to_s
+      raise CloudLB::Exception::ExpiredAuthToken if res_code == "401"
+      raise CloudLB::Exception::JustRetry if res_code == "422" or res_code == "413"
       response
     rescue Errno::EPIPE, Errno::EINVAL, EOFError
       # Server closed the connection, retry
@@ -193,6 +195,9 @@ module CloudLB
     rescue CloudLB::Exception::ExpiredAuthToken
       raise CloudLB::Exception::Connection, "Authentication token expired and you have requested not to retry" if @retry_auth == false
       CloudLB::Authentication.new(self)
+      retry
+    rescue CloudLB::Exception::JustRetry
+      sleep 10
       retry
     end
 

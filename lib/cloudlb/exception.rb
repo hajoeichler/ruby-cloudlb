@@ -49,8 +49,12 @@ module CloudLB
     end
     class Syntax                      < StandardError # :nodoc:
     end
-    
-        
+
+    # Plus one we want to recover automatically by retrying
+
+    class JustRetry                   < StandardError # :nodoc:
+    end
+
     # In the event of a non-200 HTTP status code, this method takes the HTTP response, parses
     # the JSON from the body to get more information about the exception, then raises the
     # proper error.  Note that all exceptions are scoped in the CloudLB::Exception namespace.
