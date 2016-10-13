@@ -17,7 +17,7 @@ Gem::Specification.new do |s|
   s.required_rubygems_version = ">= 1.3.6"
 
   s.add_runtime_dependency "typhoeus"
-  s.add_runtime_dependency "json"
+  s.add_runtime_dependency "json", "1.6.6"
 
   s.files = [
     "COPYING",
